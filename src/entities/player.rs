@@ -1,11 +1,22 @@
 use sdl2::rect::{Point, Rect};
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Direction {
+    Up,
+    Down,
+    Left,
+    Right,
+}
+
+#[derive(Debug)]
 pub struct Player {
     pub name: String,
     pub health: i32,
     pub position: Point,
     pub sprite: Rect,
     pub speed: i32,
+    pub direction: Direction,
+    pub current_frame: i32,
 }
 
 impl Player {
@@ -22,6 +33,8 @@ impl Player {
             position: _position,
             sprite: _rect,
             speed: _speed,
+            direction: Direction::Down,
+            current_frame: 0,
         })
     }
 
@@ -31,5 +44,38 @@ impl Player {
 
     pub fn get_health(&self) -> i32 {
         return self.health;
+    }
+
+    pub fn update_player(&mut self) {
+        use self::Direction::*;
+
+        match self.direction {
+            Left => {
+                self.position = self.position.offset(-self.speed, 0);
+            }
+            Right => {
+                self.position = self.position.offset(self.speed, 0);
+            }
+            Up => {
+                self.position = self.position.offset(0, -self.speed);
+            }
+            Down => {
+                self.position = self.position.offset(0, self.speed);
+            }
+        }
+
+        if self.speed != 0 {
+            self.current_frame = (self.current_frame + 1) % 3;
+        }
+    }
+
+    pub fn direction_spritesheet_row(direction: Direction) -> i32 {
+        use self::Direction::*;
+        match direction {
+            Up => 3,
+            Down => 0,
+            Left => 1,
+            Right => 2,
+        }
     }
 }

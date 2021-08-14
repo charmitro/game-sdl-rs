@@ -5,11 +5,14 @@ use std::time::Duration;
 
 use sdl2::event::Event;
 use sdl2::image::{self, InitFlag, LoadTexture};
+use sdl2::keyboard::Keycode;
 use sdl2::pixels::Color;
 use sdl2::rect::{Point, Rect};
 use sdl2::render::{Texture, WindowCanvas};
 
 extern crate sdl2;
+
+const PLAYER_MOVEMENT_SPEED: i32 = 2;
 
 fn render(
     canvas: &mut WindowCanvas,
@@ -22,10 +25,19 @@ fn render(
 
     let (width, height) = canvas.output_size()?;
 
-    let screen_pos = player.position + Point::new(width as i32 / 2, height as i32 / 2);
-    let screen_rect = Rect::from_center(screen_pos, player.sprite.width(), player.sprite.height());
+    let (frame_width, frame_height) = player.sprite.size();
+    let current_frame = Rect::new(
+        player.sprite.x() + frame_width as i32 * player.current_frame,
+        player.sprite.y()
+            + frame_height as i32 * Player::direction_spritesheet_row(player.direction),
+        frame_width,
+        frame_height,
+    );
 
-    canvas.copy(texture, player.sprite, screen_rect)?;
+    let screen_pos = player.position + Point::new(width as i32 / 2, height as i32 / 2);
+    let screen_rect = Rect::from_center(screen_pos, frame_width, frame_height);
+
+    canvas.copy(texture, current_frame, screen_rect)?;
 
     canvas.present();
 
@@ -56,6 +68,8 @@ fn main() -> Result<(), String> {
         position: Point::new(0, 0),
         sprite: Rect::new(0, 0, 26, 26),
         speed: 5,
+        direction: entities::player::Direction::Right,
+        current_frame: 0,
     };
 
     let mut event_pump = sdl_context.event_pump().unwrap();
@@ -71,33 +85,64 @@ fn main() -> Result<(), String> {
                     break 'running;
                 }
                 Event::KeyDown {
-                    keycode: Some(sdl2::keyboard::Keycode::Left),
+                    keycode: Some(Keycode::Left),
+                    repeat: false,
                     ..
                 } => {
-                    player.position = player.position.offset(-player.speed, 0);
+                    player.speed = PLAYER_MOVEMENT_SPEED;
+                    player.direction = Direction::Left;
                 }
                 Event::KeyDown {
-                    keycode: Some(sdl2::keyboard::Keycode::Right),
+                    keycode: Some(Keycode::Right),
+                    repeat: false,
                     ..
                 } => {
-                    player.position = player.position.offset(player.speed, 0);
+                    player.speed = PLAYER_MOVEMENT_SPEED;
+                    player.direction = Direction::Right;
                 }
                 Event::KeyDown {
-                    keycode: Some(sdl2::keyboard::Keycode::Up),
+                    keycode: Some(Keycode::Up),
+                    repeat: false,
                     ..
                 } => {
-                    player.position = player.position.offset(0, -player.speed);
+                    player.speed = PLAYER_MOVEMENT_SPEED;
+                    player.direction = Direction::Up;
                 }
                 Event::KeyDown {
-                    keycode: Some(sdl2::keyboard::Keycode::Down),
+                    keycode: Some(Keycode::Down),
+                    repeat: false,
                     ..
                 } => {
-                    player.position = player.position.offset(0, player.speed);
+                    player.speed = PLAYER_MOVEMENT_SPEED;
+                    player.direction = Direction::Down;
+                }
+                Event::KeyUp {
+                    keycode: Some(Keycode::Left),
+                    repeat: false,
+                    ..
+                }
+                | Event::KeyUp {
+                    keycode: Some(Keycode::Right),
+                    repeat: false,
+                    ..
+                }
+                | Event::KeyUp {
+                    keycode: Some(Keycode::Up),
+                    repeat: false,
+                    ..
+                }
+                | Event::KeyUp {
+                    keycode: Some(Keycode::Down),
+                    repeat: false,
+                    ..
+                } => {
+                    player.speed = 0;
                 }
                 _ => {}
             }
         }
 
+        player.update_player();
         i = (i + 1) % 255;
         render(&mut canvas, Color::RGB(i, 64, 255 - i), &texture, &player)?;
 
