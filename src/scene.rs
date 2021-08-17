@@ -7,5 +7,5 @@ pub struct Scene;
 impl<'a> System<'a> for Scene {
     type SystemData = WriteStorage<'a, SceneStatus>;
 
-    fn run(&mut self, data: Self::SystemData) {}
+    fn run(&mut self, _data: Self::SystemData) {}
 }
