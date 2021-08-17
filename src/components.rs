@@ -12,6 +12,18 @@ pub enum Direction {
     Right,
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Status {
+    Start,
+    Pause,
+}
+
+#[derive(Component, Debug)]
+#[storage(VecStorage)]
+pub struct SceneStatus {
+    pub status: Status,
+}
+
 #[derive(Component, Debug, Default)]
 #[storage(NullStorage)]
 pub struct KeyboardControlled;
