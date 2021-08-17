@@ -3,6 +3,7 @@ mod components;
 mod keyboard;
 mod physics;
 mod renderer;
+mod scene;
 mod utils;
 
 use sdl2::event::Event;
@@ -35,6 +36,7 @@ fn main() -> Result<(), String> {
 
     let texture_creator = canvas.texture_creator();
     let mut dispatcher = DispatcherBuilder::new()
+        .with(scene::Scene, "Scene", &[])
         .with(keyboard::Keyboard, "Keyboard", &[])
         .with(physics::Physics, "Physics", &[])
         .with(animator::Animator, "Animator", &[])
@@ -57,6 +59,9 @@ fn main() -> Result<(), String> {
 
     world
         .create_entity()
+        .with(SceneStatus {
+            status: Status::Start,
+        })
         .with(KeyboardControlled)
         .with(Position(Point::new(0, 0)))
         .with(Velocity {
@@ -81,6 +86,15 @@ fn main() -> Result<(), String> {
                 } => {
                     break 'running;
                 }
+
+                Event::KeyDown {
+                    keycode: Some(Keycode::Space),
+                    repeat: false,
+                    ..
+                } => {
+                    movement_command = Some(MovementCommand::MoveStatus());
+                }
+
                 Event::KeyDown {
                     keycode: Some(Keycode::Left),
                     repeat: false,
