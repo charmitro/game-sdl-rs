@@ -5,7 +5,11 @@ use specs::prelude::*;
 
 use crate::components::*;
 
-pub type SystemData<'a> = (ReadStorage<'a, Position>, ReadStorage<'a, Sprite>);
+pub type SystemData<'a> = (
+    ReadStorage<'a, Position>,
+    ReadStorage<'a, Sprite>,
+    ReadStorage<'a, SceneStatus>,
+);
 
 pub fn render(
     canvas: &mut WindowCanvas,
@@ -18,7 +22,7 @@ pub fn render(
 
     let (width, height) = canvas.output_size()?;
 
-    for (pos, sprite) in (&data.0, &data.1).join() {
+    for (pos, sprite, scene_status) in (&data.0, &data.1, &data.2).join() {
         let current_frame = sprite.region;
 
         let screen_position = pos.0 + Point::new(width as i32 / 2, height as i32 / 2);
@@ -27,7 +31,12 @@ pub fn render(
             current_frame.width(),
             current_frame.height(),
         );
-        canvas.copy(&textures[sprite.spritesheet], current_frame, screen_rect)?;
+
+        if scene_status.status == Status::Start {
+            canvas.copy(&textures[sprite.spritesheet], current_frame, screen_rect)?;
+        } else {
+            canvas.draw_color();
+        }
     }
 
     canvas.present();

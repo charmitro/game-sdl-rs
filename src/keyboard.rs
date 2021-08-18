@@ -25,8 +25,10 @@ impl<'a> System<'a> for Keyboard {
         for (_, vel, _status) in (&data.1, &mut data.2, &mut data.3).join() {
             match movement_command {
                 &MovementCommand::Move(direction) => {
-                    vel.speed = PLAYER_MOVEMENT_SPEED;
-                    vel.direction = direction;
+                    if _status.status == Status::Start {
+                        vel.speed = PLAYER_MOVEMENT_SPEED;
+                        vel.direction = direction;
+                    }
                 }
                 MovementCommand::Stop => vel.speed = 0,
                 MovementCommand::MoveStatus() => {
