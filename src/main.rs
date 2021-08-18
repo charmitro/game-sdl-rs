@@ -149,6 +149,7 @@ fn main() -> Result<(), String> {
             }
         }
 
+        // This one is tricky
         *world.write_resource() = movement_command;
 
         // Update
@@ -165,6 +166,7 @@ fn main() -> Result<(), String> {
         )?;
 
         // Time management!
+        // TODO: We need to find out how to change the Frame Rate
         ::std::thread::sleep(Duration::new(0, 1_000_000_000u32 / 144));
     }
 
