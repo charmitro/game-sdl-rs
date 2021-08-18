@@ -4,7 +4,7 @@ use sdl2::rect::Rect;
 pub enum MovementCommand {
     Stop,
     Move(Direction),
-    MoveStatus(),
+    MoveStatusAuto(),
 }
 
 /// Returns the row of the spritesheet corresponding to the given direction

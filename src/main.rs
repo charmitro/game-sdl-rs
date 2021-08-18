@@ -24,6 +24,8 @@ fn main() -> Result<(), String> {
     let video_subsystem = sdl_context.video()?;
 
     let _image_context = image::init(InitFlag::PNG | InitFlag::JPG)?;
+    let font_loader = sdl2::ttf::init().map_err(|e| e.to_string())?;
+
     let window = video_subsystem
         .window("game tutorial", 800, 600)
         .build()
@@ -49,7 +51,17 @@ fn main() -> Result<(), String> {
     let movement_command: Option<MovementCommand> = None;
     world.insert(movement_command);
 
-    let textures = [texture_creator.load_texture("assets/bardo.png")?];
+    let mut font = font_loader.load_font("assets/FiraCode-Regular.ttf", 200)?;
+    font.set_style(sdl2::ttf::FontStyle::BOLD);
+    let surface = font
+        .render("Hello Rust!")
+        .blended(Color::BLACK)
+        .map_err(|e| e.to_string())?;
+    let font_text = texture_creator
+        .create_texture_from_surface(&surface)
+        .unwrap();
+
+    let textures = [texture_creator.load_texture("assets/bardo.png")?, font_text];
 
     // First texture in textures array
     let player_spritesheet = 0;
@@ -88,11 +100,11 @@ fn main() -> Result<(), String> {
                 }
 
                 Event::KeyDown {
-                    keycode: Some(Keycode::Space),
+                    keycode: Some(Keycode::Pause),
                     repeat: false,
                     ..
                 } => {
-                    movement_command = Some(MovementCommand::MoveStatus());
+                    movement_command = Some(MovementCommand::MoveStatusAuto());
                 }
 
                 Event::KeyDown {

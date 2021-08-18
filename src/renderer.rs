@@ -23,19 +23,25 @@ pub fn render(
     let (width, height) = canvas.output_size()?;
 
     for (pos, sprite, scene_status) in (&data.0, &data.1, &data.2).join() {
-        let current_frame = sprite.region;
-
-        let screen_position = pos.0 + Point::new(width as i32 / 2, height as i32 / 2);
-        let screen_rect = Rect::from_center(
-            screen_position,
-            current_frame.width(),
-            current_frame.height(),
-        );
-
         if scene_status.status == Status::Start {
+            let current_frame = sprite.region;
+
+            let screen_position = pos.0 + Point::new(width as i32 / 2, height as i32 / 2);
+            let screen_rect = Rect::from_center(
+                screen_position,
+                current_frame.width(),
+                current_frame.height(),
+            );
+
             canvas.copy(&textures[sprite.spritesheet], current_frame, screen_rect)?;
-        } else {
-            canvas.draw_color();
+        } else if scene_status.status == Status::Pause {
+            canvas.set_draw_color(Color::MAGENTA);
+            canvas.clear();
+            canvas.copy(
+                &textures[1],
+                None,
+                Rect::new(80, 200, 200, 200),
+            )?;
         }
     }
 

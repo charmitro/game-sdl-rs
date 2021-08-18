@@ -31,7 +31,7 @@ impl<'a> System<'a> for Keyboard {
                     }
                 }
                 MovementCommand::Stop => vel.speed = 0,
-                MovementCommand::MoveStatus() => {
+                MovementCommand::MoveStatusAuto() => {
                     if _status.status == Status::Start {
                         _status.status = Status::Pause;
                     } else {
