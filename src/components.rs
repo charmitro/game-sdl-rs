@@ -50,6 +50,20 @@ pub struct Sprite {
     pub region: Rect,
 }
 
+#[derive(Component, Debug, Clone)]
+#[storage(VecStorage)]
+pub struct Text {
+    pub font: String,
+    pub region: Rect,
+    pub pos: Point,
+}
+
+impl Text {
+    pub fn init(font: String, region: Rect, pos: Point) -> Text {
+        return Text { font, region, pos };
+    }
+}
+
 #[derive(Component, Debug)]
 #[storage(VecStorage)]
 pub struct MovementAnimation {

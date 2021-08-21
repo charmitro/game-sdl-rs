@@ -53,6 +53,7 @@ fn main() -> Result<(), String> {
 
     let mut font = font_loader.load_font("assets/FiraCode-Regular.ttf", 200)?;
     font.set_style(sdl2::ttf::FontStyle::BOLD);
+
     let surface = font
         .render("Hello Rust!")
         .blended(Color::BLACK)
@@ -74,6 +75,11 @@ fn main() -> Result<(), String> {
         .with(SceneStatus {
             status: Status::Start,
         })
+        .with(Text::init(
+            String::from("assets/FiraCode-Regular.ttf"),
+            Rect::new(20, 20, 20, 20),
+            Point::new(20, 20),
+        ))
         .with(KeyboardControlled)
         .with(Position(Point::new(0, 0)))
         .with(Velocity {
